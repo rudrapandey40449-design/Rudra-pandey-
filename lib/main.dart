@@ -31,30 +31,30 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(Icons.school, size: 70, color: Colors.indigo),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               const Text('कोचिंग पोर्टल (पिन: 1234)', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               TextField(
                 controller: _pin,
                 keyboardType: TextInputType.number,
                 obscureText: true,
                 maxLength: 4,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 26, letterSpacing: 14),
+                style: const TextStyle(fontSize: 24, letterSpacing: 10),
                 decoration: const InputDecoration(border: OutlineInputBorder(), hintText: '••••', counterText: ''),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               ElevatedButton(
                 onPressed: () {
                   if (_pin.text.trim() == '1234') {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('गलत पिन! सही पिन 1234 है')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('गलत पिन!')));
                   }
                 },
                 child: const Text('लॉगिन करें'),
@@ -74,24 +74,24 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('डैशबोर्ड')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         children: [
-          _b(context, 'हाजिरी दर्ज करें (Attendance)', Icons.how_to_reg, Colors.teal, const AttendanceScreen()),
-          _b(context, 'मासिक फीस ट्रैकर (Fees)', Icons.currency_rupee, Colors.green, const FeeScreen()),
-          _b(context, 'टेस्ट अंक (Test Marks)', Icons.assignment_turned_in, Colors.deepPurple, const TestScreen()),
-          _b(context, 'नया छात्र जोड़ें (Add Student)', Icons.person_add, Colors.blue, const AddStudentScreen()),
-          _b(context, 'छात्र प्रोफ़ाइल खोजें (Search)', Icons.search, Colors.orange, const ProfileSearchScreen()),
+          _btn(context, 'हाजिरी दर्ज करें (Attendance)', Icons.how_to_reg, Colors.teal, const AttendanceScreen()),
+          _btn(context, 'मासिक फीस ट्रैकर (Fees)', Icons.currency_rupee, Colors.green, const FeeScreen()),
+          _btn(context, 'टेस्ट अंक (Test Marks)', Icons.assignment_turned_in, Colors.deepPurple, const TestScreen()),
+          _btn(context, 'नया छात्र जोड़ें (Add Student)', Icons.person_add, Colors.blue, const AddStudentScreen()),
+          _btn(context, 'छात्र प्रोफ़ाइल खोजें (Search)', Icons.search, Colors.orange, const ProfileSearchScreen()),
         ],
       ),
     );
   }
 
-  Widget _b(BuildContext c, String t, IconData i, Color cl, Widget p) => Card(
-    margin: const EdgeInsets.only(bottom: 12),
+  Widget _btn(BuildContext c, String t, IconData i, Color cl, Widget p) => Card(
+    margin: const EdgeInsets.only(bottom: 10),
     child: ListTile(
       leading: Icon(i, color: cl),
       title: Text(t, style: const TextStyle(fontWeight: FontWeight.bold)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 14),
       onTap: () => Navigator.push(c, MaterialPageRoute(builder: (_) => p)),
     ),
   );
@@ -106,6 +106,7 @@ class AddStudentScreen extends StatefulWidget {
 class _AddStudentScreenState extends State<AddStudentScreen> {
   final _n = TextEditingController(), _r = TextEditingController(), _p = TextEditingController();
   final _f = TextEditingController(), _c = TextEditingController(), _a = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +118,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           TextField(controller: _r, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'रोल नंबर *')),
           TextField(controller: _p, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'मोबाइल नंबर')),
           TextField(controller: _f, decoration: const InputDecoration(labelText: 'पिता का नाम')),
-          TextField(controller: _c, decoration: const InputDecoration(labelText: 'कक्षा / बैच (उदा. 11th)')),
+          TextField(controller: _c, decoration: const InputDecoration(labelText: 'कक्षा / बैच')),
           TextField(controller: _a, decoration: const InputDecoration(labelText: 'पता (गाँव/शहर)')),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -128,7 +129,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   'roll': _r.text.trim(),
                   'phone': _p.text.trim(),
                   'father': _f.text.trim(),
-                  'class': _c.text.trim().isEmpty ? '11th' : _c.text.trim(),
+                  'class': _c.text.trim().isEmpty ? 'Class 11' : _c.text.trim(),
                   'address': _a.text.trim(),
                 });
                 if (mounted) Navigator.pop(context);
@@ -151,6 +152,7 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   final dKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
   final Map<String, bool> _st = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,7 +162,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         builder: (ctx, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final list = snap.data!.docs;
-          if (list.isEmpty) return const Center(child: Text('कोई छात्र नहीं मिला। पहले छात्र जोड़ें।'));
+          if (list.isEmpty) return const Center(child: Text('कोई छात्र नहीं मिला। पहले नया छात्र जोड़ें।'));
           for (var d in list) { _st.putIfAbsent(d['roll'].toString(), () => true); }
           return Column(
             children: [
@@ -201,6 +203,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
 class FeeScreen extends StatelessWidget {
   const FeeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final m = DateFormat('MMMM yyyy').format(DateTime.now());
@@ -222,7 +225,7 @@ class FeeScreen extends StatelessWidget {
                   final p = feeMap[r] ?? false;
                   return ListTile(
                     title: Text(s1.data!.docs[i]['name'] ?? ''),
-                    subtitle: Text('रोल: $r \vert{}${p ? "जमा (Paid)" : "बाकी (Pending)"}'),
+                    subtitle: Text('रोल: $r | ${p ? "जमा (Paid)" : "बाकी (Pending)"}'),
                     trailing: ElevatedButton(
                       onPressed: () => FirebaseFirestore.instance.collection('fees').doc('$m-$r').set({'month': m, 'roll': r, 'isPaid': !p}),
                       child: Text(p ? 'Paid ✔' : 'Pending ✖'),
@@ -247,6 +250,7 @@ class TestScreen extends StatefulWidget {
 class _TestScreenState extends State<TestScreen> {
   final _t = TextEditingController(text: '15-Day Test'), _tot = TextEditingController(text: '50');
   final Map<String, TextEditingController> _m = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -318,4 +322,56 @@ class _ProfileSearchScreenState extends State<ProfileSearchScreen> {
   final _s = TextEditingController();
   String? _roll;
 
-  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('छात्र प्रोफ़ाइल')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(child: TextField(controller: _s, decoration: const InputDecoration(labelText: 'रोल नंबर दर्ज करें'))),
+                IconButton(icon: const Icon(Icons.search), onPressed: () => setState(() => _roll = _s.text.trim())),
+              ],
+            ),
+            if (_roll != null && _roll!.isNotEmpty)
+              Expanded(
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('students').doc(_roll).snapshots(),
+                  builder: (ctx, s1) {
+                    if (!s1.hasData || !s1.data!.exists) return const Center(child: Text('छात्र नहीं मिला।'));
+                    final d = s1.data!.data() as Map<String, dynamic>;
+                    return ListView(
+                      children: [
+                        ListTile(
+                          title: Text(d['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          subtitle: Text('रोल: ${d['roll']}\nकक्षा: ${d['class']}\nमोबाइल: ${d['phone'] ?? "नहीं"}\nपिता: ${d['father'] ?? "नहीं"}\nपता: ${d['address'] ?? "नहीं"}'),
+                        ),
+                        const Divider(),
+                        const Text('टेस्ट रिकॉर्ड्स:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection('tests').where('roll', isEqualTo: _roll).snapshots(),
+                          builder: (ctx, s2) {
+                            if (!s2.hasData) return const SizedBox();
+                            return Column(
+                              children: s2.data!.docs.map((doc) => ListTile(
+                                title: Text(doc['testName'] ?? 'Test'),
+                                subtitle: Text('दिनांक: ${doc['date']}'),
+                                trailing: Text('${doc['obtainedMarks']} / ${doc['totalMarks']}'),
+                              )).toList(),
+                            );
+                          },
+                        )
+                      ],
+                    );
+                  },
+                ),
+              )
+          ],
+        ),
+      ),
+    );
+  }
+}
