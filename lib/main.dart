@@ -39,109 +39,56 @@ class MainDashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        title: const Text(
-          'Smart Attendance Portal',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
+        title: const Text('Smart Attendance Portal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
-        elevation: 2,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.deepPurple,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Welcome to Attendance Portal',
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      'छात्र उपस्थिति, प्रोफाइल और आईडी कार्ड प्रबंधन',
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
+                    Text('Welcome to Attendance Portal', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 4),
+                    Text('छात्र उपस्थिति, प्रोफाइल और आईडी कार्ड प्रबंधन', style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'मुख्य सेवाएं (Services)',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              const Text('मुख्य सेवाएं (Services)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.95,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.0,
                 children: [
-                  _buildDashboardCard(
-                    context,
-                    title: 'Mark Attendance',
-                    subtitle: 'हाजिरी लगाएं (Face)',
-                    icon: Icons.camera_front_rounded,
-                    color: Colors.deepPurple,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AttendanceInputScreen()),
-                      );
-                    },
-                  ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Register Student',
-                    subtitle: 'नया छात्र जोड़ें',
-                    icon: Icons.person_add_alt_1_rounded,
-                    color: Colors.blue,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegisterStudentScreen()),
-                      );
-                    },
-                  ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Update Details',
-                    subtitle: 'जानकारी बदलें',
-                    icon: Icons.edit_note_rounded,
-                    color: Colors.orange,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const UpdateStudentScreen()),
-                      );
-                    },
-                  ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Student ID Card',
-                    subtitle: 'आईडी कार्ड बनाएं',
-                    icon: Icons.badge_rounded,
-                    color: Colors.teal,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const StudentIdCardScreen()),
-                      );
-                    },
-                  ),
+                  _menuItem(context, 'Mark Attendance', 'हाजिरी लगाएं (Face)', Icons.camera_front, Colors.deepPurple, () {
+                    Navigator.push(context, MaterialPageRoute(builder: (c) => const AttendanceInputScreen()));
+                  }),
+                  _menuItem(context, 'Register Student', 'नया छात्र जोड़ें', Icons.person_add, Colors.blue, () {
+                    Navigator.push(context, MaterialPageRoute(builder: (c) => const RegisterStudentScreen()));
+                  }),
+                  _menuItem(context, 'Update Details', 'जानकारी बदलें', Icons.edit_note, Colors.orange, () {
+                    Navigator.push(context, MaterialPageRoute(builder: (c) => const UpdateStudentScreen()));
+                  }),
+                  _menuItem(context, 'Student ID Card', 'आईडी कार्ड देखें', Icons.badge, Colors.teal, () {
+                    Navigator.push(context, MaterialPageRoute(builder: (c) => const StudentIdCardScreen()));
+                  }),
                 ],
               ),
             ],
@@ -151,44 +98,25 @@ class MainDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDashboardCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _menuItem(BuildContext context, String title, String sub, IconData icon, Color color, VoidCallback tap) {
     return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      onTap: tap,
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.grey.shade300),
         ),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: color.withOpacity(0.15),
-              child: Icon(icon, color: color, size: 32),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
+            CircleAvatar(radius: 24, backgroundColor: color.withOpacity(0.15), child: Icon(icon, color: color, size: 28)),
+            const SizedBox(height: 10),
+            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 2),
+            Text(sub, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
           ],
         ),
       ),
@@ -196,7 +124,7 @@ class MainDashboardScreen extends StatelessWidget {
   }
 }
 
-// ---------------- 2. ATTENDANCE INPUT SCREEN ----------------
+// ---------------- 2. ATTENDANCE INPUT ----------------
 class AttendanceInputScreen extends StatefulWidget {
   const AttendanceInputScreen({super.key});
 
@@ -205,58 +133,44 @@ class AttendanceInputScreen extends StatefulWidget {
 }
 
 class _AttendanceInputScreenState extends State<AttendanceInputScreen> {
-  final TextEditingController _idController = TextEditingController();
-
-  void _openCamera() {
-    String studentId = _idController.text.trim();
-    if (studentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('कृपया छात्र रोल नंबर या आईडी दर्ज करें!'), backgroundColor: Colors.red),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ScannerScreen(studentId: studentId)),
-    );
-  }
+  final TextEditingController _idCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Mark Attendance')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            const Icon(Icons.face_retouching_natural, size: 80, color: Colors.deepPurple),
+            const Icon(Icons.face_retouching_natural, size: 70, color: Colors.deepPurple),
             const SizedBox(height: 16),
-            const Text(
-              'छात्र की उपस्थिति लगाएं',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text('रोल नंबर डालें और चेहरा स्कैन करके प्रेजेंट मार्क करें।', style: TextStyle(color: Colors.grey)),
-            const SizedBox(height: 30),
+            const Text('छात्र उपस्थिति दर्ज करें', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
             TextField(
-              controller: _idController,
+              controller: _idCtrl,
               decoration: InputDecoration(
                 labelText: 'Student Roll No / ID',
                 hintText: 'उदा. STU-01, 101, या 1',
-                prefixIcon: const Icon(Icons.badge_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                prefixIcon: const Icon(Icons.badge),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              height: 52,
+              height: 48,
               child: ElevatedButton.icon(
-                onPressed: _openCamera,
+                onPressed: () {
+                  String id = _idCtrl.text.trim();
+                  if (id.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('कृपया रोल नंबर दर्ज करें!'), backgroundColor: Colors.red));
+                    return;
+                  }
+                  Navigator.push(context, MaterialPageRoute(builder: (c) => ScannerScreen(studentId: id)));
+                },
                 icon: const Icon(Icons.camera_alt, color: Colors.white),
-                label: const Text('चेहरा स्कैन करें', style: TextStyle(color: Colors.white, fontSize: 16)),
+                label: const Text('चेहरा स्कैन करें', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
               ),
             ),
@@ -295,13 +209,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
         break;
       }
     }
-
     _cameraController = CameraController(selectedCam, ResolutionPreset.medium, enableAudio: false);
     try {
       await _cameraController!.initialize();
       if (mounted) setState(() {});
     } catch (e) {
-      debugPrint("Camera init error: $e");
+      debugPrint("Camera error: $e");
     }
   }
 
@@ -311,46 +224,26 @@ class _ScannerScreenState extends State<ScannerScreen> {
     super.dispose();
   }
 
-  void _markAttendance(String status) async {
+  void _recordStatus(String status) async {
     setState(() => _isProcessing = true);
-    await Future.delayed(const Duration(milliseconds: 600));
-
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              status == 'PRESENT' ? Icons.check_circle_rounded : Icons.cancel_rounded,
-              color: status == 'PRESENT' ? Colors.green : Colors.red,
-              size: 65,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              status == 'PRESENT' ? 'Present मार्क हुआ!' : 'Absent मार्क हुआ!',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            Text('ID: ${widget.studentId}', style: const TextStyle(fontSize: 15)),
-            Text(
-              'समय: ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                Navigator.pop(context);
-              },
-              child: const Text('ठीक है'),
-            ),
-          ],
-        ),
+        title: Text(status == 'PRESENT' ? 'Present दर्ज!' : 'Absent दर्ज!'),
+        content: Text('ID: ${widget.studentId}\nStatus: $status'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pop(context);
+            },
+            child: const Text('ठीक है'),
+          ),
+        ],
       ),
     );
   }
@@ -360,7 +253,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Student ID: ${widget.studentId}', style: const TextStyle(color: Colors.white)),
+        title: Text('ID: ${widget.studentId}', style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -368,49 +261,36 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : Stack(
               children: [
-                Center(
-                  child: AspectRatio(
-                    aspectRatio: 1 / _cameraController!.value.aspectRatio,
-                    child: CameraPreview(_cameraController!),
-                  ),
-                ),
+                Center(child: CameraPreview(_cameraController!)),
                 Center(
                   child: Container(
-                    width: 240,
-                    height: 310,
+                    width: 230,
+                    height: 290,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white70, width: 2.5),
-                      borderRadius: const BorderRadius.all(Radius.elliptical(240, 310)),
+                      border: Border.all(color: Colors.white70, width: 2),
+                      borderRadius: const BorderRadius.all(Radius.elliptical(230, 290)),
                     ),
                   ),
                 ),
                 Positioned(
-                  bottom: 30,
-                  left: 20,
-                  right: 20,
+                  bottom: 24,
+                  left: 16,
+                  right: 16,
                   child: Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _isProcessing ? null : () => _markAttendance('ABSENT'),
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          label: const Text('Absent', style: TextStyle(color: Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
+                        child: ElevatedButton(
+                          onPressed: _isProcessing ? null : () => _recordStatus('ABSENT'),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          child: const Text('Absent', style: TextStyle(color: Colors.white)),
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _isProcessing ? null : () => _markAttendance('PRESENT'),
-                          icon: const Icon(Icons.check, color: Colors.white),
-                          label: const Text('Present', style: TextStyle(color: Colors.white)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
+                        child: ElevatedButton(
+                          onPressed: _isProcessing ? null : () => _recordStatus('PRESENT'),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                          child: const Text('Present', style: TextStyle(color: Colors.white)),
                         ),
                       ),
                     ],
@@ -422,62 +302,34 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 }
 
-// ---------------- 4. REGISTER STUDENT SCREEN ----------------
+// ---------------- 4. REGISTER STUDENT ----------------
 class RegisterStudentScreen extends StatelessWidget {
   const RegisterStudentScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register New Student')),
-      body: SingleChildScrollView(
+      appBar: AppBar(title: const Text('Register Student')),
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.blueAccent,
-              child: Icon(Icons.camera_alt, size: 40, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            const Text('छात्र की फ़ोटो जोड़ें', style: TextStyle(color: Colors.grey)),
-            const SizedBox(height: 24),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Student Full Name',
-                prefixIcon: const Icon(Icons.person),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Roll Number / ID',
-                prefixIcon: const Icon(Icons.tag),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Class / Branch',
-                prefixIcon: const Icon(Icons.school),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
+            const TextField(decoration: InputDecoration(labelText: 'Student Full Name', prefixIcon: Icon(Icons.person))),
+            const SizedBox(height: 12),
+            const TextField(decoration: InputDecoration(labelText: 'Roll Number', prefixIcon: Icon(Icons.numbers))),
+            const SizedBox(height: 12),
+            const TextField(decoration: InputDecoration(labelText: 'Class / Course', prefixIcon: Icon(Icons.school))),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 46,
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('छात्र सफलतापूर्वक रजिस्टर हो गया!'), backgroundColor: Colors.green),
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('छात्र रजिस्टर हो गया!'), backgroundColor: Colors.green));
                   Navigator.pop(context);
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-                child: const Text('छात्र को सुरक्षित करें', style: TextStyle(color: Colors.white, fontSize: 16)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                child: const Text('सेव करें', style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -487,35 +339,25 @@ class RegisterStudentScreen extends StatelessWidget {
   }
 }
 
-// ---------------- 5. UPDATE STUDENT DETAILS SCREEN ----------------
+// ---------------- 5. UPDATE DETAILS ----------------
 class UpdateStudentScreen extends StatelessWidget {
   const UpdateStudentScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Update Student Details')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'खोजें (Roll No या ID)',
-                suffixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text('छात्र का रोल नंबर दर्ज करके विवरण खोजें और संपादित करें।', style: TextStyle(color: Colors.grey)),
-          ],
+      appBar: AppBar(title: const Text('Update Details')),
+      body: const Padding(
+        padding: EdgeInsets.all(20),
+        child: TextField(
+          decoration: InputDecoration(labelText: 'Roll No दर्ज करें', suffixIcon: Icon(Icons.search)),
         ),
       ),
     );
   }
 }
 
-// ---------------- 6. STUDENT ID CARD SCREEN ----------------
+// ---------------- 6. STUDENT ID CARD ----------------
 class StudentIdCardScreen extends StatelessWidget {
   const StudentIdCardScreen({super.key});
 
@@ -524,42 +366,36 @@ class StudentIdCardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Student ID Card')),
       body: Center(
-        child: Container(
-          width: 320,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.deepPurple.shade100, width: 2),
+        child: Card(
+          margin: const EdgeInsets.all(20),
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: const Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(radius: 36, child: Icon(Icons.person, size: 40)),
+                SizedBox(height: 12),
+                Text('Aman Pandey', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 4),
+                Text('Roll No: STU-101', style: TextStyle(color: Colors.grey)),
+                Text('Class: 11th Science', style: TextStyle(color: Colors.grey)),
+                SizedBox(height: 12),
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Status: Active', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                    Icon(Icons.qr_code, size: 30),
+                  ],
+                ),
+              ],
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                decoration: BoxDecoration(color: Colors.deepPurple, borderRadius: BorderRadius.circular(10)),
-                child: const Text('STUDENT IDENTITY CARD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-              const SizedBox(height: 20),
-              const CircleAvatar(
-                radius: 45,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 50, color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              const Text('Aman Pandey', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              const Text('Roll No: STU-101', style: TextStyle(color: Colors.black87)),
-              const Text('Class: 11th Science', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 20),
-              const Divider(),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Status: Active', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  Icon(Icons.qr_code_2, size: 36, color: Colors.black87),
-                ],
-              ),
-            ],
-          ),
- 
+        ),
+      ),
+    );
+  }
+}
+
