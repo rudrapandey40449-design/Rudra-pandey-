@@ -26,13 +26,15 @@ jobs:
 
       - name: Create Complete Flutter Project Structure
         run: |
-          # Fresh valid project structure generate karein
+          # Android folder generate karein
           flutter create /tmp/base_app --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
-          
-          # Android folder aur missing files copy karein
           cp -r /tmp/base_app/android $GITHUB_WORKSPACE/
           
-          # Root me bilkul fresh aur valid pubspec.yaml likhein
+          # Android gradle minSdk update karein (tflite/camera ke liye zaruri)
+          sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle 2>/dev/null || true
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle 2>/dev/null || true
+
+          # Sahi packages ke sath pubspec.yaml likhein
           cat << 'EOF' > $GITHUB_WORKSPACE/pubspec.yaml
           name: attendance_app
           description: "Attendance App built with Flutter"
@@ -46,6 +48,12 @@ jobs:
             flutter:
               sdk: flutter
             cupertino_icons: ^1.0.8
+            image: ^3.3.0
+            tflite_flutter: ^0.10.4
+            camera: ^0.10.5+9
+            google_mlkit_face_detection: ^0.11.0
+            path_provider: ^2.1.3
+            intl: ^0.19.0
 
           dev_dependencies:
             flutter_test:
