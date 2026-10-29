@@ -1,4 +1,4 @@
-  name: attendance_app
+name: attendance_app
 description: "Smart Online Attendance App"
 publish_to: 'none'
 version: 1.0.0+1
