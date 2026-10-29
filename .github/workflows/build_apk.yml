@@ -8,85 +8,159 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.x'
+          flutter-version: '3.24.5'
           channel: 'stable'
 
-      - name: Create Complete Flutter Project Structure
+      - name: Configure Android Project Structure
         run: |
-          flutter create /tmp/base_app --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
-          cp -r /tmp/base_app/android $GITHUB_WORKSPACE/
+          mkdir -p lib
+          mkdir -p android/app
           
-          # Android SDK 35 aur minSdk 21 force update karein
-          sed -i 's/compileSdkVersion = flutter.compileSdkVersion/compileSdkVersion = 35/g' android/app/build.gradle 2>/dev/null || true
-          sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 35/g' android/app/build.gradle 2>/dev/null || true
-          sed -i 's/targetSdkVersion = flutter.targetSdkVersion/targetSdkVersion = 35/g' android/app/build.gradle 2>/dev/null || true
-          sed -i 's/targetSdk = flutter.targetSdkVersion/targetSdk = 35/g' android/app/build.gradle 2>/dev/null || true
-          sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle 2>/dev/null || true
-          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle 2>/dev/null || true
-
-          # R8 / Proguard minification band karein (TFLite GPU crash fix)
-          cat << 'EOF' > android/app/proguard-rules.pro
-          -dontwarn org.tensorflow.lite.**
-          -keep class org.tensorflow.lite.** { *; }
-          -dontwarn com.google.mlkit.**
-          -keep class com.google.mlkit.** { *; }
+          cat << 'EOF' > android/settings.gradle
+          include ':app'
+          def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+          def properties = new Properties()
+          assert localPropertiesFile.exists()
+          localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
+          def flutterSdkPath = properties.getProperty("flutter.sdk")
+          assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+          apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
           EOF
 
-          cat << 'EOF' > $GITHUB_WORKSPACE/pubspec.yaml
-          name: attendance_app
-          description: "Attendance App built with Flutter"
-          publish_to: "none"
-          version: 1.0.0+1
-
-          environment:
-            sdk: ">=3.0.0 <4.0.0"
-
-          dependencies:
-            flutter:
-              sdk: flutter
-            cupertino_icons: ^1.0.8
-            image: ^4.2.0
-            tflite_flutter: ^0.11.0
-            camera: ^0.10.6
-            camera_android: ^0.10.9+1
-            google_mlkit_face_detection: ^0.11.0
-            path_provider: ^2.1.3
-            intl: ^0.19.0
-
-          dependency_overrides:
-            camera_android_camerax: 0.6.10+3
-
-          dev_dependencies:
-            flutter_test:
-              sdk: flutter
-            flutter_lints: ^4.0.0
-
-          flutter:
-            uses-material-design: true
+          cat << 'EOF' > android/build.gradle
+          buildscript {
+              ext.kotlin_version = '1.9.10'
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+                  classpath 'com.google.gms:google-services:4.4.1'
+                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.buildDir = '../build'
+          subprojects {
+              project.buildDir = "${rootProject.buildDir}/${project.name}"
+              project.evaluationDependsOn(':app')
+          }
+          tasks.register("clean", Delete) {
+              delete rootProject.buildDir
+          }
           EOF
 
-      - name: Install dependencies
-        run: flutter pub get
+          cat << 'EOF' > android/app/build.gradle
+          plugins {
+              id "com.android.application"
+              id "kotlin-android"
+              id "dev.flutter.flutter-gradle-plugin"
+              id "com.google.gms.google-services"
+          }
+          def localProperties = new Properties()
+          def localPropertiesFile = rootProject.file('local.properties')
+          if (localPropertiesFile.exists()) {
+              localPropertiesFile.withReader('UTF-8') { reader ->
+                  localProperties.load(reader)
+              }
+          }
+          def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+          def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+
+          android {
+              namespace "com.example.attendance_app"
+              compileSdkVersion 34
+              ndkVersion flutter.ndkVersion
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+              defaultConfig {
+                  applicationId "com.example.attendance_app"
+                  minSdkVersion 21
+                  targetSdkVersion 34
+                  versionCode flutterVersionCode.toInteger()
+                  versionName flutterVersionName
+                  multiDexEnabled true
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.debug
+                  }
+              }
+          }
+          flutter {
+              source '../..'
+          }
+          dependencies {
+              implementation platform('com.google.firebase:firebase-bom:33.1.0')
+          }
+          EOF
+
+          mkdir -p android/app/src/main
+          cat << 'EOF' > android/app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+              package="com.example.attendance_app">
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application
+                  android:label="Smart Attendance"
+                  android:name="${applicationName}"
+                  android:icon="@mipmap/ic_launcher">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:launchMode="singleTop"
+                      android:theme="@style/LaunchTheme"
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                      android:hardwareAccelerated="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+                  <meta-data
+                      android:name="flutterEmbedding"
+                      android:value="2" />
+              </application>
+          </manifest>
+          EOF
+
+      - name: Clean & Get Packages
+        run: |
+          flutter clean
+          flutter pub get
 
       - name: Build Release APK
-        run: flutter build apk --release --no-shrink --no-tree-shake-icons
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: attendance-app-apk
+          name: Smart-Attendance-App
           path: build/app/outputs/flutter-apk/app-release.apk
           
