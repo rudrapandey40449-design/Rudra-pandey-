@@ -30,7 +30,7 @@ class AttendanceSystemApp extends StatelessWidget {
   }
 }
 
-// ---------------- 1. MAIN DASHBOARD SCREEN ----------------
+// ---------------- 1. DASHBOARD ----------------
 class MainDashboardScreen extends StatelessWidget {
   const MainDashboardScreen({super.key});
 
@@ -174,7 +174,7 @@ class MainDashboardScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: color.withAlpha(35),
+              backgroundColor: color.withOpacity(0.15),
               child: Icon(icon, color: color, size: 32),
             ),
             const SizedBox(height: 12),
@@ -196,7 +196,7 @@ class MainDashboardScreen extends StatelessWidget {
   }
 }
 
-// ---------------- 2. ATTENDANCE (ROLL NO INPUT & SCAN) ----------------
+// ---------------- 2. ATTENDANCE INPUT SCREEN ----------------
 class AttendanceInputScreen extends StatefulWidget {
   const AttendanceInputScreen({super.key});
 
@@ -267,7 +267,7 @@ class _AttendanceInputScreenState extends State<AttendanceInputScreen> {
   }
 }
 
-// ---------------- 3. CAMERA SCANNER SCREEN ----------------
+// ---------------- 3. SCANNER SCREEN ----------------
 class ScannerScreen extends StatefulWidget {
   final String studentId;
   const ScannerScreen({super.key, required this.studentId});
@@ -387,4 +387,179 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 Positioned(
                   bottom: 30,
                   left: 20,
-                  
+                  right: 20,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isProcessing ? null : () => _markAttendance('ABSENT'),
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          label: const Text('Absent', style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isProcessing ? null : () => _markAttendance('PRESENT'),
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          label: const Text('Present', style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+// ---------------- 4. REGISTER STUDENT SCREEN ----------------
+class RegisterStudentScreen extends StatelessWidget {
+  const RegisterStudentScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Register New Student')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const CircleAvatar(
+              radius: 45,
+              backgroundColor: Colors.blueAccent,
+              child: Icon(Icons.camera_alt, size: 40, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            const Text('छात्र की फ़ोटो जोड़ें', style: TextStyle(color: Colors.grey)),
+            const SizedBox(height: 24),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Student Full Name',
+                prefixIcon: const Icon(Icons.person),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Roll Number / ID',
+                prefixIcon: const Icon(Icons.tag),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Class / Branch',
+                prefixIcon: const Icon(Icons.school),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('छात्र सफलतापूर्वक रजिस्टर हो गया!'), backgroundColor: Colors.green),
+                  );
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                child: const Text('छात्र को सुरक्षित करें', style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------- 5. UPDATE STUDENT DETAILS SCREEN ----------------
+class UpdateStudentScreen extends StatelessWidget {
+  const UpdateStudentScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Update Student Details')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'खोजें (Roll No या ID)',
+                suffixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text('छात्र का रोल नंबर दर्ज करके विवरण खोजें और संपादित करें।', style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------- 6. STUDENT ID CARD SCREEN ----------------
+class StudentIdCardScreen extends StatelessWidget {
+  const StudentIdCardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Student ID Card')),
+      body: Center(
+        child: Container(
+          width: 320,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.deepPurple.shade100, width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(color: Colors.deepPurple, borderRadius: BorderRadius.circular(10)),
+                child: const Text('STUDENT IDENTITY CARD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+              ),
+              const SizedBox(height: 20),
+              const CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, size: 50, color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              const Text('Aman Pandey', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              const Text('Roll No: STU-101', style: TextStyle(color: Colors.black87)),
+              const Text('Class: 11th Science', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 20),
+              const Divider(),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Status: Active', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                  Icon(Icons.qr_code_2, size: 36, color: Colors.black87),
+                ],
+              ),
+            ],
+          ),
+ 
