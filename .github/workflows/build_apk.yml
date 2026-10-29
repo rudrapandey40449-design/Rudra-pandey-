@@ -26,7 +26,7 @@ jobs:
 
       - name: Recreate Android Project Files
         run: |
-          flutter create . --platforms=android --org com.rudrapandey.attendance
+          flutter create . --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
 
       - name: Install dependencies
         run: flutter pub get
