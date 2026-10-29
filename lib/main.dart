@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class _AdminAuthState extends State<AdminAuth> {
   final _id = TextEditingController(), _pw = TextEditingController(), _org = TextEditingController();
   bool isReg = false, _load = false;
 
-  Future<void> _submit() async {
+  Future<void> _sub() async {
     final id = _id.text.trim().toLowerCase(), pw = _pw.text.trim(), org = _org.text.trim();
     if (id.isEmpty || pw.isEmpty) return;
     setState(() => _load = true);
@@ -62,14 +63,14 @@ class _AdminAuthState extends State<AdminAuth> {
           padding: const EdgeInsets.all(20),
           child: Card(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.account_balance, size: 50, color: Color(0xFF0D253F)),
-                  const SizedBox(height: 8),
+                  const Icon(Icons.account_balance, size: 45, color: Color(0xFF0D253F)),
+                  const SizedBox(height: 6),
                   Text(isReg ? 'नया एडमिन पंजीकरण' : 'राष्ट्रीय कोचिंग पोर्टल लॉगिन', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   if (isReg) TextField(controller: _org, decoration: const InputDecoration(labelText: 'कोचिंग / संस्था का नाम', border: OutlineInputBorder(), isDense: true)),
                   if (isReg) const SizedBox(height: 8),
                   TextField(controller: _id, decoration: const InputDecoration(labelText: 'एडमिन आईडी (यूज़रनेम)', border: OutlineInputBorder(), isDense: true)),
@@ -78,7 +79,7 @@ class _AdminAuthState extends State<AdminAuth> {
                   const SizedBox(height: 14),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(42)),
-                    onPressed: _load ? null : _submit,
+                    onPressed: _load ? null : _sub,
                     child: _load ? const CircularProgressIndicator(color: Colors.white) : Text(isReg ? 'पंजीकृत करें' : 'प्रवेश करें'),
                   ),
                   TextButton(onPressed: () => setState(() => isReg = !isReg), child: Text(isReg ? 'लॉगिन करें' : 'नया खाता बनाएँ')),
@@ -110,20 +111,20 @@ class Dashboard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: const Color(0xFF0D253F), borderRadius: BorderRadius.circular(8)),
-            child: Text('अधिकृत एडमिन: $aId | दिनांक: ${DateFormat('dd-MM-yyyy').format(DateTime.now())}', style: const TextStyle(color: Colors.white, fontSize: 13)),
+            child: Text('अधिकृत एडमिन: $aId \vert{} दिनांक: ${DateFormat('dd-MM-yyyy').format(DateTime.now())}', style: const TextStyle(color: Colors.white, fontSize: 13)),
           ),
           const SizedBox(height: 12),
-          _btn(context, 'दैनिक व मासिक हाजिरी (Attendance)', Icons.how_to_reg, Colors.teal, AttMod(aId: aId)),
-          _btn(context, 'शुल्क संग्रह रजिस्टर (Fee Ledger)', Icons.currency_rupee, Colors.green, FeeMod(aId: aId)),
-          _btn(context, 'विषयवार परीक्षा अंक (Test Marks)', Icons.assignment, Colors.indigo, TestMod(aId: aId)),
-          _btn(context, 'छात्र नामांकन (Add Student)', Icons.person_add, Colors.blue, AddStdMod(aId: aId)),
-          _btn(context, 'डिजिटल छात्र रिकॉर्ड (Student Dossier)', Icons.badge, Colors.orange, SearchMod(aId: aId)),
+          _b(context, 'हाजिरी व फेस सत्यापन (Attendance)', Icons.camera_alt, Colors.teal, AttMod(aId: aId)),
+          _b(context, 'शुल्क संग्रह रजिस्टर (Fee Ledger)', Icons.currency_rupee, Colors.green, FeeMod(aId: aId)),
+          _b(context, 'विषयवार परीक्षा अंक (Test Marks)', Icons.assignment, Colors.indigo, TestMod(aId: aId)),
+          _b(context, 'छात्र नामांकन (Add Student)', Icons.person_add, Colors.blue, AddStdMod(aId: aId)),
+          _b(context, 'डिजिटल छात्र रिकॉर्ड (Dossier)', Icons.badge, Colors.orange, SearchMod(aId: aId)),
         ],
       ),
     );
   }
 
-  Widget _btn(BuildContext c, String t, IconData i, Color cl, Widget p) => Card(
+  Widget _b(BuildContext c, String t, IconData i, Color cl, Widget p) => Card(
     margin: const EdgeInsets.only(bottom: 10),
     child: ListTile(
       leading: Icon(i, color: cl),
@@ -150,15 +151,15 @@ class _AddStdModState extends State<AddStdMod> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: _n, decoration: const InputDecoration(labelText: 'छात्र का पूरा नाम *')),
+          TextField(controller: _n, decoration: const InputDecoration(labelText: 'छात्र का नाम *')),
           TextField(controller: _r, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'अनुक्रमांक (Roll No) *')),
           TextField(controller: _p, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'मोबाइल नंबर')),
           TextField(controller: _f, decoration: const InputDecoration(labelText: 'पिता का नाम')),
           TextField(controller: _c, decoration: const InputDecoration(labelText: 'कक्षा / वर्ग (उदा. 11th)')),
-          TextField(controller: _a, decoration: const InputDecoration(labelText: 'पूरा पता (गाँव/शहर)')),
+          TextField(controller: _a, decoration: const InputDecoration(labelText: 'पूरा पता')),
           const SizedBox(height: 18),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(44)),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
             onPressed: () async {
               if (_n.text.isNotEmpty && _r.text.isNotEmpty) {
                 await FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('students').doc(_r.text.trim()).set({
@@ -173,7 +174,8 @@ class _AddStdModState extends State<AddStdMod> {
       ),
     );
   }
-}class AttMod extends StatefulWidget {
+}
+class AttMod extends StatefulWidget {
   final String aId;
   const AttMod({super.key, required this.aId});
   @override
@@ -182,28 +184,35 @@ class _AddStdModState extends State<AddStdMod> {
 
 class _AttModState extends State<AttMod> {
   DateTime _dt = DateTime.now();
-  final Map<String, bool> _st = {};
+  final Map<String, bool> _st = {}, _face = {};
+  final ImagePicker _picker = ImagePicker();
   String get _dKey => DateFormat('yyyy-MM-dd').format(_dt);
+
+  Future<void> _scan(String roll) async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
+    if (photo != null) {
+      setState(() { _face[roll] = true; _st[roll] = true; });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('उपस्थिति पंजिका'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('उपस्थिति व फेस सत्यापन'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.all(10),
             child: Row(
               children: [
-                Text('दिनांक: $_dKey', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('तारीख: $_dKey', style: const TextStyle(fontWeight: FontWeight.bold)),
                 const Spacer(),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.calendar_today, size: 16),
-                  label: const Text('तारीख चुनें'),
+                OutlinedButton(
                   onPressed: () async {
                     final p = await showDatePicker(context: context, initialDate: _dt, firstDate: DateTime(2025), lastDate: DateTime.now());
                     if (p != null) setState(() => _dt = p);
                   },
+                  child: const Text('तारीख बदलें'),
                 )
               ],
             ),
@@ -219,19 +228,28 @@ class _AttModState extends State<AttMod> {
                   stream: FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('attendance').where('date', isEqualTo: _dKey).snapshots(),
                   builder: (ctx, s2) {
                     if (s2.hasData) {
-                      for (var d in s2.data!.docs) { _st[d['roll'].toString()] = d['status'] == 'Present'; }
+                      for (var d in s2.data!.docs) {
+                        final r = d['roll'].toString();
+                        _st[r] = d['status'] == 'Present';
+                        _face[r] = (d.data() as Map<String, dynamic>)['face'] == true;
+                      }
                     }
                     return ListView.builder(
                       itemCount: stds.length,
                       itemBuilder: (c, i) {
                         final r = stds[i]['roll'].toString();
-                        final isP = _st[r] ?? true;
-                        return CheckboxListTile(
-                          title: Text('${stds[i]['name']} (रोल: $r)'),
-                          subtitle: Text('फेस सत्यापन: प्रमाणित ✔ | स्थिति: ${isP ? "उपस्थित" : "अनुपस्थित"}'),
-                          value: isP,
-                          activeColor: Colors.green,
-                          onChanged: (v) => setState(() => _st[r] = v ?? true),
+                        final isV = _face[r] ?? false;
+                        return Card(
+                          child: ListTile(
+                            title: Text('${stds[i]['name']} (रोल: $r)'),
+                            subtitle: Text(isV ? 'फेस: प्रमाणित ✔ | उपस्थित' : 'सत्यापन लंबित ✖', style: TextStyle(color: isV ? Colors.green : Colors.red)),
+                            trailing: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(backgroundColor: isV ? Colors.green : const Color(0xFF0D253F), foregroundColor: Colors.white),
+                              icon: const Icon(Icons.camera_alt, size: 16),
+                              label: Text(isV ? 'पुनः' : 'स्कैन'),
+                              onPressed: () => _scan(r),
+                            ),
+                          ),
                         );
                       },
                     );
@@ -241,17 +259,17 @@ class _AttModState extends State<AttMod> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(44)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(42)),
               onPressed: () async {
                 final b = FirebaseFirestore.instance.batch();
                 _st.forEach((r, p) {
                   final ref = FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('attendance').doc('$_dKey-$r');
-                  b.set(ref, {'date': _dKey, 'month': DateFormat('MMMM yyyy').format(_dt), 'roll': r, 'status': p ? 'Present' : 'Absent'});
+                  b.set(ref, {'date': _dKey, 'roll': r, 'status': p ? 'Present' : 'Absent', 'face': _face[r] ?? false});
                 });
                 await b.commit();
-                if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('उपस्थिति सुरक्षित हो गई!')));
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('हाजिरी सुरक्षित हो गई!')));
               },
               child: Text('$_dKey की हाजिरी लॉक करें'),
             ),
@@ -276,7 +294,6 @@ class FeeMod extends StatelessWidget {
         builder: (ctx, s1) {
           if (!s1.hasData) return const Center(child: CircularProgressIndicator());
           final stds = s1.data!.docs;
-          if (stds.isEmpty) return const Center(child: Text('कोई छात्र नहीं मिला।'));
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('admins').doc(aId).collection('fees').where('month', isEqualTo: m).snapshots(),
             builder: (ctx, s2) {
@@ -287,18 +304,15 @@ class FeeMod extends StatelessWidget {
                   final r = stds[i]['roll'].toString();
                   final item = feeMap[r];
                   final isP = item != null && item['isPaid'] == true;
-                  final pDate = item?['paidOn'] ?? 'अपेक्षित';
                   return Card(
                     child: ListTile(
-                      title: Text(stds[i]['name'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text('रोल: $r | तिथि: $pDate'),
+                      title: Text(stds[i]['name'] ?? ''),
+                      subtitle: Text('रोल: $r | तिथि: ${item?['paidOn'] ?? "अपेक्षित"}'),
                       trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: isP ? Colors.green : Colors.red.shade400, foregroundColor: Colors.white),
+                        style: ElevatedButton.styleFrom(backgroundColor: isP ? Colors.green : Colors.red, foregroundColor: Colors.white),
                         onPressed: () {
-                          final now = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
-                          FirebaseFirestore.instance.collection('admins').doc(aId).collection('fees').doc('$m-$r').set({
-                            'month': m, 'roll': r, 'isPaid': !isP, 'paidOn': !isP ? now : null,
-                          });
+                          final dt = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
+                          FirebaseFirestore.instance.collection('admins').doc(aId).collection('fees').doc('$m-$r').set({'month': m, 'roll': r, 'isPaid': !isP, 'paidOn': !isP ? dt : null});
                         },
                         child: Text(isP ? 'Paid ✔' : 'Due ✖'),
                       ),
@@ -322,19 +336,18 @@ class TestMod extends StatefulWidget {
 }
 
 class _TestModState extends State<TestMod> {
-  final _t = TextEditingController(text: 'प्रथम पाक्षिक'), _sub = TextEditingController(text: 'Chemistry'), _tot = TextEditingController(text: '50');
+  final _t = TextEditingController(text: 'पाक्षिक परीक्षा'), _sub = TextEditingController(text: 'Chemistry'), _tot = TextEditingController(text: '50');
   final Map<String, TextEditingController> _m = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('परीक्षा मूल्यांकन रजिस्टर'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('परीक्षा मूल्यांकन'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('students').snapshots(),
         builder: (ctx, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final docs = snap.data!.docs;
-          if (docs.isEmpty) return const Center(child: Text('कोई छात्र पंजीकृत नहीं है।'));
           for (var d in docs) { _m.putIfAbsent(d['roll'].toString(), () => TextEditingController(text: '0')); }
           return Column(
             children: [
@@ -343,10 +356,10 @@ class _TestModState extends State<TestMod> {
                 child: Row(
                   children: [
                     Expanded(child: TextField(controller: _t, decoration: const InputDecoration(labelText: 'परीक्षा', border: OutlineInputBorder(), isDense: true))),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Expanded(child: TextField(controller: _sub, decoration: const InputDecoration(labelText: 'विषय', border: OutlineInputBorder(), isDense: true))),
-                    const SizedBox(width: 6),
-                    SizedBox(width: 65, child: TextField(controller: _tot, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'पूर्णांक', border: OutlineInputBorder(), isDense: true))),
+                    const SizedBox(width: 4),
+                    SizedBox(width: 60, child: TextField(controller: _tot, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'पूर्णांक', border: OutlineInputBorder(), isDense: true))),
                   ],
                 ),
               ),
@@ -357,28 +370,25 @@ class _TestModState extends State<TestMod> {
                     final r = docs[i]['roll'].toString();
                     return ListTile(
                       title: Text('${docs[i]['name']} (रोल: $r)'),
-                      trailing: SizedBox(width: 70, child: TextField(controller: _m[r], keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'अंक', border: OutlineInputBorder(), isDense: true))),
+                      trailing: SizedBox(width: 65, child: TextField(controller: _m[r], keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'अंक', border: OutlineInputBorder(), isDense: true))),
                     );
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(44)),
-                  onPressed: () async {
-                    final b = FirebaseFirestore.instance.batch();
-                    final dStr = DateFormat('dd-MM-yyyy').format(DateTime.now());
-                    for (var doc in docs) {
-                      final r = doc['roll'].toString();
-                      final ref = FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('tests').doc('${_t.text.trim()}-$r');
-                      b.set(ref, {'testName': _t.text.trim(), 'subject': _sub.text.trim(), 'total': _tot.text.trim(), 'marks': _m[r]?.text.trim() ?? '0', 'roll': r, 'date': dStr});
-                    }
-                    await b.commit();
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('अंक सफलतापूर्वक अपडेट हो गए!')));
-                  },
-                  child: const Text('अंक सुरक्षित व अपडेट करें'),
-                ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
+                onPressed: () async {
+                  final b = FirebaseFirestore.instance.batch();
+                  for (var doc in docs) {
+                    final r = doc['roll'].toString();
+                    b.set(FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('tests').doc('${_t.text.trim()}-$r'), {
+                      'test': _t.text.trim(), 'sub': _sub.text.trim(), 'tot': _tot.text.trim(), 'marks': _m[r]?.text.trim() ?? '0', 'roll': r, 'date': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                    });
+                  }
+                  await b.commit();
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('अंक अपडेट हो गए!')));
+                },
+                child: const Text('अंक सुरक्षित करें'),
               )
             ],
           );
@@ -402,25 +412,20 @@ class _SearchModState extends State<SearchMod> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('डिजिटल छात्र डोजियर'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
+      appBar: AppBar(title: const Text('छात्र डोजियर'), backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Row(
               children: [
-                Expanded(child: TextField(controller: _s, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'अनुक्रमांक (Roll No) खोजें', border: OutlineInputBorder(), isDense: true))),
-                const SizedBox(width: 6),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D253F), foregroundColor: Colors.white),
-                  onPressed: () => setState(() => _roll = _s.text.trim()),
-                  child: const Text('खोजें'),
-                )
+                Expanded(child: TextField(controller: _s, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'अनुक्रमांक खोजें', border: OutlineInputBorder(), isDense: true))),
+                IconButton(icon: const Icon(Icons.search), onPressed: () => setState(() => _roll = _s.text.trim())),
               ],
             ),
-            const SizedBox(height: 10),
             if (_roll != null && _roll!.isNotEmpty)
               Expanded(
+                
                 child: StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('students').doc(_roll).snapshots(),
                   builder: (ctx, s1) {
@@ -430,18 +435,16 @@ class _SearchModState extends State<SearchMod> {
                       children: [
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('${d['name']} (रोल: ${d['roll']})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                Text('कक्षा: ${d['class']} | पिता: ${d['father']}'),
-                                Text('मोबाइल: ${d['phone']} | पता: ${d['address']}'),
+                                Text('कक्षा: ${d['class']} | पिता: ${d['father']}\nमोबाइल: ${d['phone']} | पता: ${d['address']}'),
                               ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
                         StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('attendance').where('roll', isEqualTo: _roll).snapshots(),
                           builder: (ctx, att) {
@@ -452,25 +455,23 @@ class _SearchModState extends State<SearchMod> {
                             return Card(
                               color: Colors.blue.shade50,
                               child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Text('मासिक उपस्थिति: कुल $tot दिन | उपस्थित: $pres दिन | अनुपस्थित: ${tot - pres} दिन | निरंतरता: $pct%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                padding: const EdgeInsets.all(8),
+                                child: Text('कुल उपस्थिति: $tot दिन | उपस्थित: $pres | निरंतरता: $pct%', style: const TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             );
                           },
                         ),
-                        const SizedBox(height: 8),
-                        const Text('परीक्षा परिणाम विवरण:', style: TextStyle(fontWeight: FontWeight.bold)),
                         StreamBuilder<QuerySnapshot>(
                           stream: FirebaseFirestore.instance.collection('admins').doc(widget.aId).collection('tests').where('roll', isEqualTo: _roll).snapshots(),
                           builder: (ctx, ts) {
                             final tDocs = ts.data?.docs ?? [];
-                            if (tDocs.isEmpty) return const Text('कोई टेस्ट रिकॉर्ड नहीं मिला।');
                             return Column(
                               children: tDocs.map((doc) => Card(
                                 child: ListTile(
-                                  title: Text('${doc['testName']} - ${doc['subject']}'),
-                                  subtitle: Text('तिथि: ${doc['date']}'),
-                                  trailing: Text('${doc['marks']} / ${doc['total']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                  title: Text('${doc['test']} - ${doc['sub']}'),
+                                  trailing: Text('${doc['marks']} / ${doc['tot']}'),
+                                  
+
                                 ),
                               )).toList(),
                             );
@@ -487,4 +488,3 @@ class _SearchModState extends State<SearchMod> {
     );
   }
 }
-
