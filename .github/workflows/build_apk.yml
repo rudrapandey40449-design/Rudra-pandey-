@@ -25,26 +25,31 @@ jobs:
           flutter-version: '3.24.5'
           channel: 'stable'
 
-      - name: Recreate Clean Flutter Android Platform
+      - name: Setup Android & Firebase Configuration
         run: |
           rm -rf android
-          # प्रोजेक्ट का सही नाम 'attendance_app' दिया ताकि रिपॉजिटरी नाम का एरर न आए
           flutter create --platforms=android --project-name attendance_app --org com.example .
 
-          # AndroidX सेटिंग्स
+          # AndroidX Enable
           echo "android.useAndroidX=true" >> android/gradle.properties
           echo "android.enableJetifier=true" >> android/gradle.properties
 
-          # Firebase के लिए न्यूनतम SDK 21
+          # Firebase minSdkVersion 21
           sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' android/app/build.gradle || true
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
 
-          # google-services.json कॉपी करें
+          # Root build.gradle mein Google Services plugin jodein
+          sed -i '/dependencies {/a \        classpath "com.google.gms:google-services:4.4.1"' android/build.gradle || true
+
+          # App build.gradle ke aakhri mein plugin apply karein
+          echo "apply plugin: 'com.google.gms.google-services'" >> android/app/build.gradle
+
+          # google-services.json copy karein
           if [ -f "google-services.json" ]; then
             cp google-services.json android/app/
           fi
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
       - name: Build Release APK
