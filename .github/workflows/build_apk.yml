@@ -26,13 +26,19 @@ jobs:
 
       - name: Create Complete Flutter Project Structure
         run: |
+          # Fresh valid project structure generate karein
           flutter create /tmp/base_app --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
           cp -r /tmp/base_app/android $GITHUB_WORKSPACE/
           
-          # Android minSdkVersion 21 fix
+          # Android SDK 35 aur minSdk 21 force update karein
+          sed -i 's/compileSdkVersion = flutter.compileSdkVersion/compileSdkVersion = 35/g' android/app/build.gradle 2>/dev/null || true
+          sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 35/g' android/app/build.gradle 2>/dev/null || true
+          sed -i 's/targetSdkVersion = flutter.targetSdkVersion/targetSdkVersion = 35/g' android/app/build.gradle 2>/dev/null || true
+          sed -i 's/targetSdk = flutter.targetSdkVersion/targetSdk = 35/g' android/app/build.gradle 2>/dev/null || true
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle 2>/dev/null || true
           sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle 2>/dev/null || true
 
+          # Sahi pubspec.yaml setup karein
           cat << 'EOF' > $GITHUB_WORKSPACE/pubspec.yaml
           name: attendance_app
           description: "Attendance App built with Flutter"
