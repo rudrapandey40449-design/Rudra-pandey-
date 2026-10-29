@@ -1,4 +1,4 @@
-name: Build Flutter APK
+ name: Build Flutter APK
 
 on:
   push:
@@ -24,18 +24,37 @@ jobs:
           flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Setup Valid Flutter Structure
+      - name: Create Complete Flutter Project Structure
         run: |
-          mkdir -p /tmp/temp_flutter_app
-          cd /tmp/temp_flutter_app
-          flutter create . --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
+          # Fresh valid project structure generate karein
+          flutter create /tmp/base_app --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
           
-          # Root me pubspec.yaml aur android folder copy karein
-          cp -rn /tmp/temp_flutter_app/android $GITHUB_WORKSPACE/
-          cp -n /tmp/temp_flutter_app/pubspec.yaml $GITHUB_WORKSPACE/
+          # Android folder aur missing files copy karein
+          cp -r /tmp/base_app/android $GITHUB_WORKSPACE/
           
-          cd $GITHUB_WORKSPACE
-          sed -i "s/name: .*/name: attendance_app/" pubspec.yaml
+          # Root me bilkul fresh aur valid pubspec.yaml likhein
+          cat << 'EOF' > $GITHUB_WORKSPACE/pubspec.yaml
+          name: attendance_app
+          description: "Attendance App built with Flutter"
+          publish_to: "none"
+          version: 1.0.0+1
+
+          environment:
+            sdk: ">=3.0.0 <4.0.0"
+
+          dependencies:
+            flutter:
+              sdk: flutter
+            cupertino_icons: ^1.0.8
+
+          dev_dependencies:
+            flutter_test:
+              sdk: flutter
+            flutter_lints: ^4.0.0
+
+          flutter:
+            uses-material-design: true
+          EOF
 
       - name: Install dependencies
         run: flutter pub get
