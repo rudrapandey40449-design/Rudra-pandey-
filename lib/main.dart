@@ -19,7 +19,7 @@ class AttendanceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Smart Attendance & Coaching Manager',
+      title: 'Smart Attendance App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorSchemeSeed: Colors.indigo,
@@ -30,7 +30,7 @@ class AttendanceApp extends StatelessWidget {
   }
 }
 
-// ---------------- ADMIN LOGIN ----------------
+// ---------------- 1. LOGIN SCREEN ----------------
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
 
@@ -40,10 +40,9 @@ class AdminLoginScreen extends StatefulWidget {
 
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _pinController = TextEditingController();
-  final String _adminPin = "1234";
 
   void _login() {
-    if (_pinController.text.trim() == _adminPin) {
+    if (_pinController.text.trim() == "1234") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const DashboardScreen()),
@@ -51,7 +50,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('गलत पिन! सही एडमिन पिन दर्ज करें (Default: 1234)'),
+          content: Text('गलत पिन! सही पिन 1234 दर्ज करें'),
           backgroundColor: Colors.red,
         ),
       );
@@ -69,21 +68,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(22),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.indigo.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.school, size: 70, color: Colors.indigo),
+                child: const Icon(Icons.school, size: 64, color: Colors.indigo),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               const Text(
                 'कोचिंग एवं अटेंडेंस पोर्टल',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text('एडमिन पिन दर्ज करें', style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 28),
+              const Text('एडमिन पिन दर्ज करें (Default: 1234)', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 24),
               TextField(
                 controller: _pinController,
                 obscureText: true,
@@ -94,20 +93,17 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 decoration: InputDecoration(
                   counterText: "",
                   hintText: "••••",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   filled: true,
                   fillColor: Colors.grey.shade100,
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 50,
                 child: FilledButton(
                   onPressed: _login,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
                   child: const Text('लॉगिन करें', style: TextStyle(fontSize: 16)),
                 ),
               ),
@@ -119,7 +115,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 }
 
-// ---------------- DASHBOARD ----------------
+// ---------------- 2. DASHBOARD ----------------
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -146,58 +142,49 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.indigo.shade700, Colors.indigo.shade400],
               ),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('आज की दिनांक', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                const Text('आज की दिनांक', style: TextStyle(color: Colors.white70, fontSize: 13)),
                 const SizedBox(height: 4),
-                Text(today, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(today, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          _MenuCard(
-            title: 'उपस्थिति दर्ज करें (Mark Attendance)',
-            subtitle: 'छात्रों की आज की हाजिरी लगाएँ',
+          const SizedBox(height: 16),
+          _MenuTile(
+            title: 'उपस्थिति दर्ज करें (Attendance)',
             icon: Icons.how_to_reg,
             color: Colors.teal,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarkAttendanceScreen())),
           ),
-          const SizedBox(height: 12),
-          _MenuCard(
-            title: 'मासिक फीस ट्रैकर (Fee Management)',
-            subtitle: 'किस छात्र की फीस आई, किसकी बाकी है',
+          _MenuTile(
+            title: 'मासिक फीस ट्रैकर (Fees)',
             icon: Icons.currency_rupee,
             color: Colors.green,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeeManagementScreen())),
           ),
-          const SizedBox(height: 12),
-          _MenuCard(
-            title: 'टेस्ट रिज़ल्ट (Test Marks)',
-            subtitle: '15 दिन या मासिक टेस्ट के अंक रोल नंबर पर जोड़ें',
+          _MenuTile(
+            title: 'टेस्ट अंक (Test Marks)',
             icon: Icons.assignment_turned_in,
             color: Colors.deepPurple,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TestMarksScreen())),
           ),
-          const SizedBox(height: 12),
-          _MenuCard(
+          _MenuTile(
             title: 'नया छात्र जोड़ें (Add Student)',
-            subtitle: 'छात्र का नाम, रोल नंबर व क्लास सेव करें',
             icon: Icons.person_add,
             color: Colors.blue,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddStudentScreen())),
           ),
-          const SizedBox(height: 12),
-          _MenuCard(
-            title: 'छात्र रिपोर्ट कार्ड (Student Profile)',
-            subtitle: 'अटेंडेंस, टेस्ट मार्क्स और फीस रिकॉर्ड देखें',
+          _MenuTile(
+            title: 'छात्र रिपोर्ट कार्ड (Profile)',
             icon: Icons.badge,
             color: Colors.orange,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentProfileSearchScreen())),
@@ -208,16 +195,14 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class _MenuCard extends StatelessWidget {
+class _MenuTile extends StatelessWidget {
   final String title;
-  final String subtitle;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
 
-  const _MenuCard({
+  const _MenuTile({
     required this.title,
-    required this.subtitle,
     required this.icon,
     required this.color,
     required this.onTap,
@@ -226,16 +211,14 @@ class _MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1.5,
+      margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: color.withOpacity(0.15),
           child: Icon(icon, color: color),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),
@@ -243,7 +226,7 @@ class _MenuCard extends StatelessWidget {
   }
 }
 
-// ---------------- ADD STUDENT ----------------
+// ---------------- 3. ADD STUDENT ----------------
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
 
@@ -252,34 +235,32 @@ class AddStudentScreen extends StatefulWidget {
 }
 
 class _AddStudentScreenState extends State<AddStudentScreen> {
-  final _nameController = TextEditingController();
-  final _rollController = TextEditingController();
-  final _classController = TextEditingController();
-  bool _saving = false;
+  final _name = TextEditingController();
+  final _roll = TextEditingController();
+  final _class = TextEditingController();
+  bool _loading = false;
 
-  Future<void> _saveStudent() async {
-    final name = _nameController.text.trim();
-    final roll = _rollController.text.trim();
-    final sClass = _classController.text.trim();
-
+  Future<void> _save() async {
+    final name = _name.text.trim();
+    final roll = _roll.text.trim();
     if (name.isEmpty || roll.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('नाम और रोल नंबर अनिवार्य हैं!')),
+        const SnackBar(content: Text('नाम और रोल नंबर भरें!')),
       );
       return;
     }
 
-    setState(() => _saving = true);
+    setState(() => _loading = true);
     try {
       await FirebaseFirestore.instance.collection('students').doc(roll).set({
         'name': name,
         'roll': roll,
-        'class': sClass.isEmpty ? '11th' : sClass,
-        'timestamp': FieldValue.serverTimestamp(),
+        'class': _class.text.trim().isEmpty ? '11th' : _class.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('छात्र सफलतापूर्वक सेव हो गया!')),
+          const SnackBar(content: Text('छात्र सेव हो गया!')),
         );
         Navigator.pop(context);
       }
@@ -288,7 +269,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -300,30 +281,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'छात्र का नाम', border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _rollController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'रोल नंबर', border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _classController,
-              decoration: const InputDecoration(labelText: 'कक्षा / विषय', hintText: 'उदा. 11th Science', border: OutlineInputBorder()),
-            ),
-            const SizedBox(height: 24),
+            TextField(controller: _name, decoration: const InputDecoration(labelText: 'छात्र का नाम', border: OutlineInputBorder())),
+            const SizedBox(height: 14),
+            TextField(controller: _roll, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'रोल नंबर', border: OutlineInputBorder())),
+            const SizedBox(height: 14),
+            TextField(controller: _class, decoration: const InputDecoration(labelText: 'कक्षा / विषय', border: OutlineInputBorder())),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 48,
               child: FilledButton(
-                onPressed: _saving ? null : _saveStudent,
-                child: _saving
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('डेटाबेस में सुरक्षित करें'),
+                onPressed: _loading ? null : _save,
+                child: _loading ? const CircularProgressIndicator(color: Colors.white) : const Text('सेव करें'),
               ),
             )
           ],
@@ -333,7 +302,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   }
 }
 
-// ---------------- MARK ATTENDANCE ----------------
+// ---------------- 4. ATTENDANCE ----------------
 class MarkAttendanceScreen extends StatefulWidget {
   const MarkAttendanceScreen({super.key});
 
@@ -342,29 +311,27 @@ class MarkAttendanceScreen extends StatefulWidget {
 }
 
 class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
-  final String dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  final Map<String, bool> _attendance = {};
+  final String todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  final Map<String, bool> _status = {};
   bool _saving = false;
 
   Future<void> _submit() async {
     setState(() => _saving = true);
     try {
       final batch = FirebaseFirestore.instance.batch();
-      _attendance.forEach((roll, isPresent) {
-        final ref = FirebaseFirestore.instance.collection('attendance').doc('$dateKey-$roll');
-        batch.set(ref, {
-          'date': dateKey,
+      _status.forEach((roll, isPresent) {
+        final doc = FirebaseFirestore.instance.collection('attendance').doc('$todayStr-$roll');
+        batch.set(doc, {
+          'date': todayStr,
           'roll': roll,
           'status': isPresent ? 'Present' : 'Absent',
-          'timestamp': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
         });
       });
       await batch.commit();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('आज की हाजिरी सेव हो गई!')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('हाजिरी सुरक्षित हो गई!')));
         Navigator.pop(context);
       }
     } catch (e) {
@@ -377,34 +344,31 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('हाजिरी ($dateKey)')),
+      appBar: AppBar(title: Text('हाजिरी ($todayStr)')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('students').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-          final docs = snapshot.data!.docs;
-          if (docs.isEmpty) {
-            return const Center(child: Text('कोई छात्र नहीं मिला। पहले छात्र जोड़ें।'));
-          }
+          final list = snapshot.data!.docs;
+          if (list.isEmpty) return const Center(child: Text('कोई छात्र मौजूद नहीं है।'));
 
-          for (var doc in docs) {
-            final roll = doc['roll'].toString();
-            _attendance.putIfAbsent(roll, () => true);
+          for (var doc in list) {
+            _status.putIfAbsent(doc['roll'].toString(), () => true);
           }
 
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: docs.length,
+                  itemCount: list.length,
                   itemBuilder: (context, i) {
-                    final d = docs[i].data() as Map<String, dynamic>;
+                    final d = list[i].data() as Map<String, dynamic>;
                     final roll = d['roll'].toString();
                     final name = d['name'] ?? '';
-                    final isPresent = _attendance[roll] ?? true;
+                    final isPresent = _status[roll] ?? true;
 
                     return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       child: ListTile(
                         leading: CircleAvatar(child: Text(roll)),
                         title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -412,8 +376,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                           label: Text(isPresent ? 'Present' : 'Absent'),
                           selected: isPresent,
                           selectedColor: Colors.green.shade100,
-                          checkmarkColor: Colors.green,
-                          onSelected: (val) => setState(() => _attendance[roll] = val),
+                          onSelected: (val) => setState(() => _status[roll] = val),
                         ),
                       ),
                     );
@@ -421,15 +384,13 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 48,
                   child: FilledButton(
                     onPressed: _saving ? null : _submit,
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('हाजिरी सुरक्षित करें'),
+                    child: _saving ? const CircularProgressIndicator(color: Colors.white) : const Text('सुरक्षित करें'),
                   ),
                 ),
               )
@@ -441,7 +402,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   }
 }
 
-// ---------------- FEES MANAGEMENT ----------------
+// ---------------- 5. FEES MANAGEMENT ----------------
 class FeeManagementScreen extends StatefulWidget {
   const FeeManagementScreen({super.key});
 
@@ -450,14 +411,13 @@ class FeeManagementScreen extends StatefulWidget {
 }
 
 class _FeeManagementScreenState extends State<FeeManagementScreen> {
-  final String currentMonth = DateFormat('MMMM yyyy').format(DateTime.now());
+  final String curMonth = DateFormat('MMMM yyyy').format(DateTime.now());
 
-  Future<void> _toggleFee(String roll, bool currentStatus) async {
-    final docId = '$currentMonth-$roll';
-    await FirebaseFirestore.instance.collection('fees').doc(docId).set({
-      'month': currentMonth,
+  Future<void> _toggle(String roll, bool current) async {
+    await FirebaseFirestore.instance.collection('fees').doc('$curMonth-$roll').set({
+      'month': curMonth,
       'roll': roll,
-      'isPaid': !currentStatus,
+      'isPaid': !current,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
@@ -465,25 +425,21 @@ class _FeeManagementScreenState extends State<FeeManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('फीस रिकॉर्ड ($currentMonth)')),
+      appBar: AppBar(title: Text('फीस ($curMonth)')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('students').snapshots(),
-        builder: (context, studentSnap) {
-          if (!studentSnap.hasData) return const Center(child: CircularProgressIndicator());
-          final students = studentSnap.data!.docs;
+        builder: (context, snap1) {
+          if (!snap1.hasData) return const Center(child: CircularProgressIndicator());
+          final students = snap1.data!.docs;
 
           return StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('fees')
-                .where('month', isEqualTo: currentMonth)
-                .snapshots(),
-            builder: (context, feeSnap) {
-              if (!feeSnap.hasData) return const Center(child: CircularProgressIndicator());
-
+            stream: FirebaseFirestore.instance.collection('fees').where('month', isEqualTo: curMonth).snapshots(),
+            builder: (context, snap2) {
+              if (!snap2.hasData) return const Center(child: CircularProgressIndicator());
               final Map<String, bool> feeMap = {};
-              for (var doc in feeSnap.data!.docs) {
-                final data = doc.data() as Map<String, dynamic>;
-                feeMap[data['roll'].toString()] = data['isPaid'] ?? false;
+              for (var doc in snap2.data!.docs) {
+                final d = doc.data() as Map<String, dynamic>;
+                feeMap[d['roll'].toString()] = d['isPaid'] ?? false;
               }
 
               return ListView.builder(
@@ -499,19 +455,13 @@ class _FeeManagementScreenState extends State<FeeManagementScreen> {
                     child: ListTile(
                       leading: CircleAvatar(child: Text(roll)),
                       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text('स्थिति: ${isPaid ? "जमा (Paid)" : "बाकी (Pending)"}'),
-                      trailing: FilledButton.tonal(
-                        style: FilledButton.styleFrom(
+                      subtitle: Text(isPaid ? 'जमा (Paid)' : 'बाकी (Pending)'),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
                           backgroundColor: isPaid ? Colors.green.shade100 : Colors.red.shade100,
                         ),
-                        onPressed: () => _toggleFee(roll, isPaid),
-                        child: Text(
-                          isPaid ? 'Paid ✔' : 'Pending ✖',
-                          style: TextStyle(
-                            color: isPaid ? Colors.green.shade900 : Colors.red.shade900,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        onPressed: () => _toggle(roll, isPaid),
+                        child: Text(isPaid ? 'Paid' : 'Pending', style: TextStyle(color: isPaid ? Colors.green.shade900 : Colors.red.shade900)),
                       ),
                     ),
                   );
@@ -525,7 +475,7 @@ class _FeeManagementScreenState extends State<FeeManagementScreen> {
   }
 }
 
-// ---------------- TEST MARKS ----------------
+// ---------------- 6. TEST MARKS ----------------
 class TestMarksScreen extends StatefulWidget {
   const TestMarksScreen({super.key});
 
@@ -534,34 +484,27 @@ class TestMarksScreen extends StatefulWidget {
 }
 
 class _TestMarksScreenState extends State<TestMarksScreen> {
-  final _testNameController = TextEditingController(text: '15-Day Test');
-  final _totalMarksController = TextEditingController(text: '50');
-  final Map<String, TextEditingController> _marksInputs = {};
+  final _testName = TextEditingController(text: 'Monthly Test');
+  final _total = TextEditingController(text: '50');
+  final Map<String, TextEditingController> _inputs = {};
   bool _saving = false;
 
-  Future<void> _saveMarks(List<QueryDocumentSnapshot> docs) async {
-    final testName = _testNameController.text.trim();
-    final totalMarks = _totalMarksController.text.trim();
-
-    if (testName.isEmpty || totalMarks.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('टेस्ट का नाम और कुल अंक भरें!')),
-      );
-      return;
-    }
+  Future<void> _save(List<QueryDocumentSnapshot> docs) async {
+    final tName = _testName.text.trim();
+    final tTotal = _total.text.trim();
+    if (tName.isEmpty || tTotal.isEmpty) return;
 
     setState(() => _saving = true);
     try {
       final batch = FirebaseFirestore.instance.batch();
       for (var d in docs) {
         final roll = d['roll'].toString();
-        final obtained = _marksInputs[roll]?.text.trim() ?? '0';
-
-        final ref = FirebaseFirestore.instance.collection('tests').doc();
-        batch.set(ref, {
-          'testName': testName,
-          'totalMarks': totalMarks,
-          'obtainedMarks': obtained,
+        final marks = _inputs[roll]?.text.trim() ?? '0';
+        final docRef = FirebaseFirestore.instance.collection('tests').doc();
+        batch.set(docRef, {
+          'testName': tName,
+          'totalMarks': tTotal,
+          'obtainedMarks': marks,
           'roll': roll,
           'date': DateFormat('dd MMM yyyy').format(DateTime.now()),
           'timestamp': FieldValue.serverTimestamp(),
@@ -570,5 +513,53 @@ class _TestMarksScreenState extends State<TestMarksScreen> {
       await batch.commit();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('सभी टे
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('अंक सुरक्षित हो गए!')));
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('टेस्ट अंक भरें')),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('students').snapshots(),
+        builder: (context, snap) {
+          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+          final docs = snap.data!.docs;
+
+          for (var d in docs) {
+            _inputs.putIfAbsent(d['roll'].toString(), () => TextEditingController(text: '0'));
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(child: TextField(controller: _testName, decoration: const InputDecoration(labelText: 'टेस्ट नाम', border: OutlineInputBorder()))),
+                    const SizedBox(width: 8),
+                    SizedBox(width: 90, child: TextField(controller: _total, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'पूर्णांक', border: OutlineInputBorder()))),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: docs.length,
+                  itemBuilder: (context, i) {
+                    final d = docs[i].data() as Map<String, dynamic>;
+                    final roll = d['roll'].toString();
+                    return ListTile(
+                      leading: CircleAvatar(child: Text(roll)),
+                      title: Text(d['name'] ?? ''),
+                      trailing: SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _inputs[roll],
+                          keyboardType: 
