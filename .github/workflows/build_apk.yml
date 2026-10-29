@@ -26,7 +26,6 @@ jobs:
 
       - name: Create Complete Flutter Project Structure
         run: |
-          # Fresh valid project structure generate karein
           flutter create /tmp/base_app --project-name attendance_app --platforms=android --org com.rudrapandey.attendance
           cp -r /tmp/base_app/android $GITHUB_WORKSPACE/
           
@@ -38,7 +37,14 @@ jobs:
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle 2>/dev/null || true
           sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle 2>/dev/null || true
 
-          # Sahi pubspec.yaml setup karein
+          # R8 / Proguard minification band karein (TFLite GPU crash fix)
+          cat << 'EOF' > android/app/proguard-rules.pro
+          -dontwarn org.tensorflow.lite.**
+          -keep class org.tensorflow.lite.** { *; }
+          -dontwarn com.google.mlkit.**
+          -keep class com.google.mlkit.** { *; }
+          EOF
+
           cat << 'EOF' > $GITHUB_WORKSPACE/pubspec.yaml
           name: attendance_app
           description: "Attendance App built with Flutter"
@@ -76,7 +82,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Release APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release --no-shrink --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
