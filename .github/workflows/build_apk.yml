@@ -27,19 +27,19 @@ jobs:
 
       - name: Recreate Clean Flutter Android Platform
         run: |
-          # Purani incomplete android directory hatakar official clean android banayein
           rm -rf android
-          flutter create --platforms=android --org com.example .
+          # प्रोजेक्ट का सही नाम 'attendance_app' दिया ताकि रिपॉजिटरी नाम का एरर न आए
+          flutter create --platforms=android --project-name attendance_app --org com.example .
 
-          # AndroidX enable karein
+          # AndroidX सेटिंग्स
           echo "android.useAndroidX=true" >> android/gradle.properties
           echo "android.enableJetifier=true" >> android/gradle.properties
 
-          # Firebase ke liye minSdkVersion 21 set karein
+          # Firebase के लिए न्यूनतम SDK 21
           sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' android/app/build.gradle || true
           sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
 
-          # google-services.json copy karein
+          # google-services.json कॉपी करें
           if [ -f "google-services.json" ]; then
             cp google-services.json android/app/
           fi
