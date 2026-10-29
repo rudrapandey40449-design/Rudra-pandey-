@@ -6,8 +6,17 @@ import 'package:intl/intl.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
-  } catch (_) {}
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyCyezv6VO44lOP-wDRCNYuOHZ-wFtDycpk',
+        appId: '1:152984908526:android:78031fe79787a96224b9ff',
+        messagingSenderId: '152984908526',
+        projectId: 'attendance-app-9ac46',
+      ),
+    );
+  } catch (e) {
+    debugPrint("Firebase Error: $e");
+  }
   runApp(const AttendanceApp());
 }
 
@@ -168,7 +177,7 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// 3. ADD STUDENT (FULL DETAILS)
+// 3. ADD STUDENT
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
   @override
@@ -194,7 +203,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
     if (name.isEmpty || roll.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('छात्र का नाम और रोल नंबर भरना अनिवार्य है!')),
+        const SnackBar(content: Text('छात्र का नाम और रोल नंबर अनिवार्य हैं!')),
       );
       return;
     }
@@ -212,12 +221,14 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('छात्र का पूरा विवरण सफलतापूर्वक सुरक्षित हो गया!')),
+          const SnackBar(content: Text('छात्र डेटाबेस में सुरक्षित हो गया!'), backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Firebase Error: $e'), backgroundColor: Colors.red));
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -298,11 +309,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       });
       await b.commit();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('आज की हाजिरी सुरक्षित हो गई!')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('आज की हाजिरी सुरक्षित हो गई!'), backgroundColor: Colors.green));
         Navigator.pop(context);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -315,6 +326,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('students').snapshots(),
         builder: (context, snap) {
+          if (snap.hasError) {
+            return Center(child: Padding(padding: const EdgeInsets.all(16), child: Text('डेटा लोड नहीं हो पाया: ${snap.error}', style: const TextStyle(color: Colors.red))));
+          }
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -338,7 +352,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           }
 
           for (var d in list) {
-            _status.putIfAbsent(d['roll'].toString(), () => true);
+            final r = (d.data() as Map<String, dynamic>)['roll']?.toString() ?? '';
+            if (r.isNotEmpty) _status.putIfAbsent(r, () => true);
           }
 
           return Column(
@@ -348,14 +363,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   itemCount: list.length,
                   itemBuilder: (ctx, i) {
                     final d = list[i].data() as Map<String, dynamic>;
-                    final roll = d['roll'].toString();
-                    final name = d['name'] ?? '';
+                    final roll = d['roll']?.toString() ?? '';
+                    final name = d['name']?.toString() ?? '';
                     final isPres = _status[roll] ?? true;
 
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       child: CheckboxListTile(
-                        secondary: CircleAvatar(child: Text(roll)),
+                        secondary: CircleAvatar(child: Text(roll.isEmpty ? '?' : roll)),
                         title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(isPres ? 'उपस्थित (Present)' : 'अनुपस्थित (Absent)'),
                         value: isPres,
@@ -398,6 +413,7 @@ class FeeScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('students').snapshots(),
         builder: (ctx, s1) {
+          if (s1.hasError) return Center(child: Padding(padding: const EdgeInsets.all(16), child: Text('Error: ${s1.error}')));
           if (s1.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           final students = s1.data?.docs ?? [];
           if (students.isEmpty) {
@@ -411,7 +427,7 @@ class FeeScreen extends StatelessWidget {
               if (s2.hasData) {
                 for (var doc in s2.data!.docs) {
                   final d = doc.data() as Map<String, dynamic>;
-                  feeMap[d['roll'].toString()] = d['isPaid'] == true;
+                  feeMap[d['roll']?.toString() ?? ''] = d['isPaid'] == true;
                 }
               }
 
@@ -420,13 +436,13 @@ class FeeScreen extends StatelessWidget {
                 itemCount: students.length,
                 itemBuilder: (ctx, i) {
                   final s = students[i].data() as Map<String, dynamic>;
-                  final r = s['roll'].toString();
-                  final name = s['name'] ?? '';
+                  final r = s['roll']?.toString() ?? '';
+                  final name = s['name']?.toString() ?? '';
                   final paid = feeMap[r] ?? false;
 
                   return Card(
                     child: ListTile(
-                      leading: CircleAvatar(child: Text(r)),
+                      leading: CircleAvatar(child: Text(r.isEmpty ? '?' : r)),
                       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(paid ? 'जमा (Paid)' : 'बाकी (Pending)'),
                       trailing: FilledButton.tonal(
@@ -480,7 +496,7 @@ class _TestScreenState extends State<TestScreen> {
     try {
       final b = FirebaseFirestore.instance.batch();
       for (var d in docs) {
-        final r = d['roll'].toString();
+        final r = (d.data() as Map<String, dynamic>)['roll']?.toString() ?? '';
         final marks = _m[r]?.text.trim() ?? '0';
         final docRef = FirebaseFirestore.instance.collection('tests').doc();
         b.set(docRef, {
@@ -494,11 +510,11 @@ class _TestScreenState extends State<TestScreen> {
       }
       await b.commit();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('टेस्ट अंक सुरक्षित हो गए!')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('टेस्ट अंक सुरक्षित हो गए!'), backgroundColor: Colors.green));
         Navigator.pop(context);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -511,183 +527,10 @@ class _TestScreenState extends State<TestScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('students').snapshots(),
         builder: (ctx, snap) {
+          if (snap.hasError) return Center(child: Padding(padding: const EdgeInsets.all(16), child: Text('Error: ${snap.error}')));
           if (snap.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           final docs = snap.data?.docs ?? [];
-          if (docs.isEmpty) {
-            return const Center(child: Text('कोई छात्र मौजूद नहीं है। पहले छात्र जोड़ें।'));
-          }
+          if (docs.isEmpty) return const Center(child: Text('कोई छात्र मौजूद नहीं है।'));
 
           for (var d in docs) {
-            _m.putIfAbsent(d['roll'].toString(), () => TextEditingController(text: '0'));
-          }
-
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Expanded(child: TextField(controller: _tName, decoration: const InputDecoration(labelText: 'टेस्ट नाम', border: OutlineInputBorder()))),
-                    const SizedBox(width: 8),
-                    SizedBox(width: 90, child: TextField(controller: _tot, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'पूर्णांक', border: OutlineInputBorder()))),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: docs.length,
-                  itemBuilder: (ctx, i) {
-                    final d = docs[i].data() as Map<String, dynamic>;
-                    final r = d['roll'].toString();
-                    return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      child: ListTile(
-                        leading: CircleAvatar(child: Text(r)),
-                        title: Text(d['name'] ?? ''),
-                        trailing: SizedBox(
-                          width: 70,
-                          child: TextField(
-                            controller: _m[r],
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            decoration: const InputDecoration(border: OutlineInputBorder(), isDense: true),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: _saving ? null : () => _save(docs),
-                    child: _saving ? const CircularProgressIndicator(color: Colors.white) : const Text('सुरक्षित करें'),
-                  ),
-                ),
-              )
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-// 7. PROFILE SEARCH
-class StudentProfileSearchScreen extends StatefulWidget {
-  const StudentProfileSearchScreen({super.key});
-  @override
-  State<StudentProfileSearchScreen> createState() => _StudentProfileSearchScreenState();
-}
-
-class _StudentProfileSearchScreenState extends State<StudentProfileSearchScreen> {
-  final _search = TextEditingController();
-  String? _targetRoll;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('छात्र प्रोफ़ाइल व रिकॉर्ड')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _search,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'रोल नंबर दर्ज करें',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () => setState(() => _targetRoll = _search.text.trim()),
-                  child: const Text('खोजें'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (_targetRoll != null && _targetRoll!.isNotEmpty)
-              Expanded(
-                child: StreamBuilder<DocumentSnapshot>(
-                  stream: FirebaseFirestore.instance.collection('students').doc(_targetRoll).snapshots(),
-                  builder: (ctx, sSnap) {
-                    if (sSnap.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-                    if (!sSnap.hasData || !sSnap.data!.exists) {
-                      return const Center(child: Text('इस रोल नंबर का कोई छात्र नहीं मिला।'));
-                    }
-
-                    final data = sSnap.data!.data() as Map<String, dynamic>;
-                    return ListView(
-                      children: [
-                        Card(
-                          color: Colors.indigo.shade50,
-                          child: Padding(
-                            padding: const EdgeInsets.all(14),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('नाम: ${data['name']}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text('रोल नंबर: ${data['roll']} | कक्षा: ${data['class'] ?? ""}'),
-                                const SizedBox(height: 4),
-                                Text('पिता का नाम: ${data['father'] ?? "दर्ज नहीं"}'),
-                                const SizedBox(height: 4),
-                                Text('मोबाइल नंबर: ${data['phone'] ?? "दर्ज नहीं"}'),
-                                const SizedBox(height: 4),
-                                Text('पता: ${data['address'] ?? "दर्ज नहीं"}'),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text('टेस्ट रिकॉर्ड्स:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance
-                              .collection('tests')
-                              .where('roll', isEqualTo: _targetRoll)
-                              .snapshots(),
-                          builder: (ctx, tSnap) {
-                            if (!tSnap.hasData) return const LinearProgressIndicator();
-                            final tests = tSnap.data!.docs;
-                            if (tests.isEmpty) return const Text('कोई टेस्ट रिकॉर्ड दर्ज नहीं है।');
-
-                            return Column(
-                              children: tests.map((doc) {
-                                final t = doc.data() as Map<String, dynamic>;
-                                return Card(
-                                  child: ListTile(
-                                    leading: const Icon(Icons.star, color: Colors.amber),
-                                    title: Text(t['testName'] ?? 'Test'),
-                                    subtitle: Text('दिनांक: ${t['date'] ?? ""}'),
-                                    trailing: Text(
-                                      '${t['obtainedMarks']} / ${t['totalMarks']}',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              )
-          ],
-        ),
-      ),
-    );
-  }
-}
+            final r = (d.data() as Map<String, 
