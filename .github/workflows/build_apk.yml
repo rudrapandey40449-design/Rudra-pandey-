@@ -28,12 +28,13 @@ jobs:
       - name: Create Clean Android Folder
         run: |
           rm -rf android
-          flutter create --platforms=android --project-name attendance_app --org com.example .
+          flutter create --platforms=android .
           echo "android.useAndroidX=true" >> android/gradle.properties
           echo "android.enableJetifier=true" >> android/gradle.properties
           echo "org.gradle.jvmargs=-Xmx4096M" >> android/gradle.properties
-          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' android/app/build.gradle || true
-          sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion .*/minSdkVersion 21/' android/app/build.gradle || true
+          sed -i 's/minSdkVersion = .*/minSdkVersion = 21/' android/app/build.gradle || true
+          sed -i 's/minSdkVersion = .*/minSdkVersion = 21/' /opt/hostedtoolcache/flutter/*/x64/packages/flutter_tools/gradle/src/main/groovy/flutter.groovy || true
 
       - name: Get Dependencies
         run: flutter pub get
